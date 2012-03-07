@@ -39,7 +39,7 @@ buildPOWDf <- function() {
   
   # Add state vector from "City, State" column, strip that 
   # column to just city
-  df.comb[, "State"] <- unlist(lapply(strsplit(df.comb[, 1], ", "), `[`, 2))
+  df.comb[, "State"] <- factor(unlist(lapply(strsplit(df.comb[, 1], ", "), `[`, 2)))
   df.comb[, 1] <- unlist(lapply(strsplit(df.comb[, 1], ", "), `[`, 1))
   
   df.comb <- df.comb[, c(1,6,2:5)]
