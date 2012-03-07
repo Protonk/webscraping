@@ -3,13 +3,13 @@ library(plyr)
 library(ggplot2)
 
 # Assumes you have run the setup script to 
-# generate trimmed.price.df
+# generate price.df
 
 
 # Show the growth from the start for the ratings as a whole
 
 growFromSt <- function() {
-  fromstart <- ddply(trimmed.price.df, .(trimmed.price.df[, "Date"]), "nrow")
+  fromstart <- ddply(price.df, .(price.df[, "Date"]), "nrow")
   names(fromstart) <- c("Date", "Ratings")
   ggplot(data = fromstart, aes(Date, Ratings)) + geom_line() +
     scale_x_date(name = '') + scale_y_continuous(name = "Ratings per Day")
@@ -19,7 +19,7 @@ growFromSt <- function() {
 # much there.
 
 dayofmonth <- function() {
-  dayM <- ddply(trimmed.price.df, .(format(trimmed.price.df[, "Date"], "%d")), "nrow")
+  dayM <- ddply(price.df, .(format(price.df[, "Date"], "%d")), "nrow")
   dayM[, 1] <- sub("^0","",dayM[, 1])
   names(dayM) <- c("DayofM", "Ratings")
   dayM[, 1] <- factor(dayM[, 1], levels = unique(sub("^0","",dayM[, 1])))
@@ -33,8 +33,8 @@ dayofmonth <- function() {
 byState <- function(metric) {
   states_map <- map_data("state")
   rperst <- switch(metric,
-                   Ratings = ddply(trimmed.price.df, .(trimmed.price.df[, "State"]), "nrow"),
-                   Price = ddply(trimmed.price.df, .(trimmed.price.df[, "State"]), summarise, mean(`Price Per Oz`)))
+                   Ratings = ddply(price.df, .(price.df[, "State"]), "nrow"),
+                   Price = ddply(price.df, .(price.df[, "State"]), summarise, mean(`Price Per Oz`)))
   names(rperst) <- c("State", metric)
   rperst[, 1] <- tolower(rperst[, 1])
   # See http://stackoverflow.com/a/6489037/1188479 for why we use
@@ -46,12 +46,12 @@ byState <- function(metric) {
 }
 
 distbyweight <- function() {
-  qplot(data = trimmed.price.df, `Price Per Oz`,  geom = "density") + facet_wrap(~ Weight)
+  qplot(data = price.df, `Price Per Oz`,  geom = "density") + facet_wrap(~ Weight)
 }
 
 # note changes by date in general
 
-datechange <- ddply(trimmed.price.df, .(trimmed.price.df[, "Date"]), summarise,
+datechange <- ddply(price.df, .(price.df[, "Date"]), summarise,
                     Quality = mean(unclass(Quality)),
                     Price = mean(`Price Per Oz`),
                     # Quality is just an ordered factor but
