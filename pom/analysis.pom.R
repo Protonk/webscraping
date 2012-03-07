@@ -87,3 +87,31 @@ plotstackedW <- function() {
           scale_y_continuous(labels = percent_format(), name = "Proportion of Total") +
           scale_x_discrete(name = "Price")
 }
+
+#
+# Load some variables locally rather than from a remote source
+#
+#
+
+
+stateinc <- structure(list(State = c("Alabama", "Alaska", "Arizona", "Arkansas", 
+                                     "California", "Colorado", "Connecticut", "Delaware", "Florida", 
+                                     "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
+                                     "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", 
+                                     "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", 
+                                     "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", 
+                                     "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
+                                     "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
+                                     "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
+                                     "West Virginia", "Wisconsin", "Wyoming"), 
+                           Income = c(42021L, 62592L, 49239L, 40812L, 58253L, 61251L, 66370L, 56128L, 47983L, 
+                                      51406L, 65280L, 50022L, 53047L, 48698L, 50896L, 49315L, 41409L, 
+                                      40778L, 49051L, 67813L, 59671L, 51413L, 59930L, 37757L, 47508L, 
+                                      44445L, 51044L, 55771L, 67916L, 67499L, 44234L, 50966L, 43676L, 
+                                      46250L, 49811L, 43012L, 51033L, 50840L, 56623L, 43942L, 48173L, 
+                                      42953L, 46856L, 56745L, 52162L, 60983L, 59150L, 42207L, 54019L, 
+                                      50234L)),
+                          .Names = c("State", "Income"), class = "data.frame", row.names = c(NA,-50L))
+
+price.df <- merge(price.df, stateinc, by = "State")
+
