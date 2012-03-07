@@ -31,18 +31,22 @@ dayofmonth <- function() {
 # ratings and reported avg. price.
 
 byState <- function(metric) {
+  states_map <- map_data("state")
   rperst <- switch(metric,
                    Ratings = ddply(trimmed.price.df, .(trimmed.price.df[, "State"]), "nrow"),
                    Price = ddply(trimmed.price.df, .(trimmed.price.df[, "State"]), summarise, mean(`Price Per Oz`)))
   names(rperst) <- c("State", metric)
   rperst[, 1] <- tolower(rperst[, 1])
-  states_map <- map_data("state")
   # See http://stackoverflow.com/a/6489037/1188479 for why we use
   # aes_string and not aes
   ggplot(data = rperst, aes(map_id = State)) + geom_map(aes_string(fill = metric), map = states_map) +
     expand_limits(x = states_map$long, y = states_map$lat) +
     scale_y_continuous(name = '') + scale_x_continuous(name = '') + 
     opts(axis.text.y = theme_blank(), axis.text.x = theme_blank(), axis.ticks = theme_blank())
+}
+
+distbyweight <- function() {
+  qplot(data = trimmed.price.df, `Price Per Oz`,  geom = "density") + facet_wrap(~ Weight)
 }
 
 
