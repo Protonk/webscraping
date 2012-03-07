@@ -1,7 +1,7 @@
 library(XML)
 
 
-buildWeedDf <- function() {
+buildPOWDf <- function() {
   # The world may be metric but most people choose fractions of 
   # ounces from the dropdown menu
   ounce <- as.numeric("28.3495231")
@@ -65,6 +65,6 @@ buildWeedDf <- function() {
   return(df.comb)
 }
 
-trimmed.price.df <- buildWeedDf()
+trimmed.price.df <- buildPOWDf()
 
 
