@@ -71,3 +71,19 @@ plotautoCor <- function() {
   }
   par(mfrow = c(1,1))
 }
+
+# Plot a stacked barplot of proportion of reported prices captured by various sizes.
+plotstackedW <- function() {
+  library(reshape2)
+  library(scales)
+  weight.tab <- table(cut(price.df[, "Price Per Oz"], breaks = seq(25, 600, by = 25)), price.df[, "Weight"])
+  weight.tab <- weight.tab/rowSums(weight.tab)
+  weight.m <- melt(weight.tab)
+  # Not quite accurate, but it looks purdy
+  levels(weight.m[,1]) <- seq(25, 575, 25)
+  names(weight.m) <- c("Price", "Weight", "Percent")
+  ggplot(weight.m,aes(x = Price,y = Percent,fill = Weight)) + 
+          geom_bar(position = "fill") + 
+          scale_y_continuous(labels = percent_format(), name = "Proportion of Total") +
+          scale_x_discrete(name = "Price")
+}
