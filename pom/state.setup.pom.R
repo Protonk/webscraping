@@ -61,6 +61,13 @@ buildPOWDf <- function() {
   # Strip outliers and add per oz price
   df.comb <- df.comb[which(df.comb[, "Price"]/df.comb[, "Weight"] >= 50 & df.comb[, "Price"]/df.comb[, "Weight"] <= 950), ]
   df.comb$`Price Per Oz` <- df.comb[, "Price"]/df.comb[, "Weight"]
+  
+  # only 77 report purchases between 0.5 oz and 1oz in grams. 
+  df.comb <- df.comb[which(df.comb[, "Weight"] %in% weight.assign[1:5]),]
+  # Convert to factor now that most of the math is done
+  df.comb[, "Weight"] <- factor(df.comb[, "Weight"], levels = signif(sort(unique(df.comb[, "Weight"])), 3))
+  
+  
   df.comb <- df.comb[, c(1:4,7,5,6)]
   return(df.comb)
 }
