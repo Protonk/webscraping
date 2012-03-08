@@ -49,22 +49,19 @@ distbyweight <- function() {
   qplot(data = price.df, `Price Per Oz`,  geom = "density") + facet_wrap(~ Weight)
 }
 
-# note changes by date in general
-
-datechange <- ddply(price.df, .(price.df[, "Date"]), summarise,
-                    Quality = mean(unclass(Quality)),
-                    Price = mean(`Price Per Oz`),
-                    # Quality is just an ordered factor but
-                    # Weight still has meaning
-                    Weight = mean(as.numeric(as.character(Weight)))
-                    )
-names(datechange) <- c("Date", "Quality", "Price", "Weight")
-
 # Not much shows up for autocorrelation. If you plot the longer series
 # It doesn't seem that reported Quality, price or weight
 # appreciably changed between 2010 and now.
 
 plotautoCor <- function() {
+  datechange <- ddply(price.df, .(price.df[, "Date"]), summarise,
+                      Quality = mean(unclass(Quality)),
+                      Price = mean(`Price Per Oz`),
+                      # Quality is just an ordered factor but
+                      # Weight still has meaning
+                      Weight = mean(as.numeric(as.character(Weight)))
+                      )
+  names(datechange) <- c("Date", "Quality", "Price", "Weight")
   par(mfrow = c(3,1))
   for (i in names(datechange)[-1]) {
     pacf(datechange[, i], main = i)
@@ -100,7 +97,6 @@ plotstackedW <- function(type) {
     # add 0 on the left and x values to stick to 
     # one df w/ ggplot
     wmr <- data.frame(cbind(t(apply(weight.tab/rowSums(weight.tab), 1, cumsum))))
-    rownames(wmr) <- NULL
     names(wmr) <- c("eighth", "fiveg", "quarter", "half", "ounce")
     mwmr <- cbind(rep(pseq, 5), melt(wmr))
     names(mwmr) <- c("Price", "Weight", "Proportion")
