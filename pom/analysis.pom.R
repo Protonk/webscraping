@@ -72,8 +72,13 @@ plotautoCor <- function() {
   par(mfrow = c(1,1))
 }
 
-# Plot a stacked barplot of proportion of reported prices captured by various sizes.
-plotstackedW <- function() {
+# Plot a stacked plot of proportion of reported prices captured by various sizes.
+# depending on type selected the result will be:
+# bar: A fixed proportion plot of weight by price (discrete)
+# ribbon: A fixed proportion plot of weight by price (continuous)
+# density: A stacked density estimate of weight by price
+
+plotstackedW <- function(type) {
   library(reshape2)
   library(scales)
   weight.tab <- table(cut(price.df[, "Price Per Oz"], breaks = seq(25, 600, by = 25)), price.df[, "Weight"])
@@ -105,6 +110,6 @@ plotstackedW <- function() {
   switch(type,
          bar = barstack(),
          ribbon = ribbonstack()
+         density = qplot(`Price Per Oz`, data = price.df, fill = Weight, geom = "density", position="stack")
          )
-
 }
