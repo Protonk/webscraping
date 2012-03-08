@@ -1,7 +1,7 @@
-library(XML)
-
+# Main function to download data. 
 
 buildPOWDf <- function() {
+  library(XML)
   # The world may be metric but most people choose fractions of 
   # ounces from the dropdown menu
   ounce <- as.numeric("28.3495231")
@@ -13,15 +13,27 @@ buildPOWDf <- function() {
   # grabs the data for each state url
   
   perpageData <- function(input.url) {
-    base.parse <- htmlParse(input.url)
-    # Detect the number of pages for each state
-    pag.test <- xpathApply(base.parse, "//div[@id='pagination']", xmlValue)[[1]]
-    max.pages <- as.numeric(tail(unlist(strsplit(gsub("\\D", "", pag.test), "")), 1))
-    # Character vector of URLs for each following page
-    appended <- paste(input.url, "?pg=", 2:max.pages, sep = "")
-    init.table <- readHTMLTable(base.parse)[[2]]
-    for (i in seq_along(appended)) {
-      init.table <- rbind(init.table, readHTMLTable(htmlParse(appended[i]))[[2]])
+    # Wrapper for XML package, see http://stackoverflow.com/questions/7269006/r-xml-package-how-to-set-the-user-agent
+    UAhtmlParse <- function(url, ...) {
+      temp <- tempfile()
+      download.file(url, temp, quiet = TRUE)
+      html.out <- htmlParse(temp, ...)
+      unlink(temp)
+      return(html.out)
+    }
+    options(HTTPUserAgent="Protonk at gmail. Contact if there is a problem")
+    # Setup the while condition
+    init.table <- data.frame(matrix(0, 0, 5))
+    i <- 1
+    p.next <- "Next"
+    # While the pagination indicates there are more pages
+    # continue to grab the next page, updating 
+    # counter and pagination test
+    while (grepl("Next", p.next, fixed = TRUE)) {
+      single.parse <- UAhtmlParse(url = paste(input.url, "?pg=", i, sep = ""))
+      init.table <- rbind(init.table, readHTMLTable(single.parse, stringsAsFactors = FALSE)[[2]])
+      p.next <- xpathApply(single.parse, "//div[@id='pagination']", xmlValue)[[1]]
+      i <- i + 1
     }
     init.table
   }
@@ -73,5 +85,3 @@ buildPOWDf <- function() {
 }
 
 price.df <- buildPOWDf()
-
-
