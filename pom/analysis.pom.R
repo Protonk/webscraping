@@ -78,23 +78,29 @@ plotstackedW <- function() {
   library(scales)
   weight.tab <- table(cut(price.df[, "Price Per Oz"], breaks = seq(25, 600, by = 25)), price.df[, "Weight"])
   weight.tab <- weight.tab/rowSums(weight.tab)
-  weight.m <- melt(weight.tab)
-  # Not quite accurate, but it looks purdy
-  levels(weight.m[,1]) <- seq(25, 575, 25)
-  names(weight.m) <- c("Price", "Weight", "Percent")
+  # Stack bar charts by treating price as a factor variable
   barstack <- function() {
+    weight.m <- melt(weight.tab)
+    # Not quite accurate, but it looks purdy
+    levels(weight.m[,1]) <- seq(25, 575, 25)
+    names(weight.m) <- c("Price", "Weight", "Percent")
     ggplot(weight.m,aes(x = Price,y = Percent,fill = Weight)) + 
       geom_bar(position = "fill") + 
       scale_y_continuous(labels = percent_format(), name = "Proportion of Total") +
       scale_x_discrete(name = "Price")  
   }
-  pseq <- seq(25, 575, 25)           
-  wmr <- data.frame(cbind(pseq, wm))
-  rownames(wmr) <- NULL
-  names(wmr) <- c("x", "inf" ,"eighth", "fiveg", "quarter", "half", "ounce")
+  # stack ribbon charts, treating price as continuous
   ribbonstack <- function() {
-    ribw <- ggplot(wmr, aes(x = x))
-    ribw + geom_ribbon(aes(ymin = half, ymax = ounce), fill = "blue") + geom_ribbon(aes(ymin = quarter, ymax = half), fill = "orange") + geom_ribbon(aes(ymin = fiveg, ymax = quarter), fill = "green") + geom_ribbon(aes(ymin = eighth, ymax = fiveg), fill = "purple") + geom_ribbon(aes(ymin = inf, ymax = eighth), fill = "brown")
+    # Cumsum of rows to produce bands for ribbon plot
+    # add 0 on the left and x values to stick to 
+    # one df w/ ggplot
+    wmr <- data.frame(cbind(t(apply(weight.tab/rowSums(weight.tab), 1, cumsum))))
+    rownames(wmr) <- NULL
+    names(wmr) <- c("eighth", "fiveg", "quarter", "half", "ounce")
+    mwmr <- cbind(rep(pseq, 5), melt(wmr))
+    names(mwmr) <- c("Price", "Weight", "Proportion")
+    mwmr[, "Weight"] <- factor(mwmr[, "Weight"], levels = c("ounce", "half", "quarter", "fiveg", "eighth"), ordered = TRUE)
+    ggplot(mwmr, aes(x = Price)) + geom_ribbon(aes(ymin = 0, ymax = Proportion, fill = Weight))
   }
   switch(type,
          bar = barstack(),
@@ -102,31 +108,3 @@ plotstackedW <- function() {
          )
 
 }
-
-#
-# Load some variables locally rather than from a remote source
-#
-#
-
-
-stateinc <- structure(list(State = c("Alabama", "Alaska", "Arizona", "Arkansas", 
-                                     "California", "Colorado", "Connecticut", "Delaware", "Florida", 
-                                     "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
-                                     "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", 
-                                     "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", 
-                                     "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", 
-                                     "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
-                                     "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
-                                     "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
-                                     "West Virginia", "Wisconsin", "Wyoming"), 
-                           Income = c(42021L, 62592L, 49239L, 40812L, 58253L, 61251L, 66370L, 56128L, 47983L, 
-                                      51406L, 65280L, 50022L, 53047L, 48698L, 50896L, 49315L, 41409L, 
-                                      40778L, 49051L, 67813L, 59671L, 51413L, 59930L, 37757L, 47508L, 
-                                      44445L, 51044L, 55771L, 67916L, 67499L, 44234L, 50966L, 43676L, 
-                                      46250L, 49811L, 43012L, 51033L, 50840L, 56623L, 43942L, 48173L, 
-                                      42953L, 46856L, 56745L, 52162L, 60983L, 59150L, 42207L, 54019L, 
-                                      50234L)),
-                          .Names = c("State", "Income"), class = "data.frame", row.names = c(NA,-50L))
-
-price.df <- merge(price.df, stateinc, by = "State")
-
