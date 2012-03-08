@@ -53,20 +53,20 @@ buildPOWDf <- function() {
     weight.num[which(df.comb[, "Weight"] %in% unique(df.comb[, "Weight"])[i])] <- weight.assign[i]
   }
   df.comb[, "Weight"] <- weight.num
-  
-  # Quality and Date to factor and date classes
-  df.comb[, "Quality"] <- factor(df.comb[, "Quality"], levels = rev(unique(df.comb[, "Quality"])), ordered = TRUE)
-  df.comb[, "Date"] <- as.Date(df.comb[, "Date"], format = "%B %d, %Y")
+  # only 77 report purchases between 0.5 oz and 1oz in grams. 
+  df.comb <- df.comb[which(df.comb[, "Weight"] %in% weight.assign[1:5]),]
   
   # Strip outliers and add per oz price
   df.comb <- df.comb[which(df.comb[, "Price"]/df.comb[, "Weight"] >= 50 & df.comb[, "Price"]/df.comb[, "Weight"] <= 640), ]
   df.comb$`Price Per Oz` <- df.comb[, "Price"]/df.comb[, "Weight"]
   
-  # only 77 report purchases between 0.5 oz and 1oz in grams. 
-  df.comb <- df.comb[which(df.comb[, "Weight"] %in% weight.assign[1:5]),]
   # Convert to factor now that most of the math is done
-  df.comb[, "Weight"] <- factor(signif(df.comb[, "Weight"], 3), levels = signif(sort(unique(df.comb[, "Weight"])), 3))
+  df.comb[, "Weight"] <- signif(df.comb[, "Weight"], 3)
+  df.comb[, "Weight"] <- factor(df.comb[, "Weight"], levels = sort(unique(df.comb[, "Weight"])))
   
+  # Quality and Date to factor and date classes
+  df.comb[, "Quality"] <- factor(df.comb[, "Quality"], levels = rev(unique(df.comb[, "Quality"])), ordered = TRUE)
+  df.comb[, "Date"] <- as.Date(df.comb[, "Date"], format = "%B %d, %Y")
   
   df.comb <- df.comb[, c(1:4,7,5,6)]
   return(df.comb)
