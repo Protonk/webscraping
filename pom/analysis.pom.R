@@ -82,10 +82,25 @@ plotstackedW <- function() {
   # Not quite accurate, but it looks purdy
   levels(weight.m[,1]) <- seq(25, 575, 25)
   names(weight.m) <- c("Price", "Weight", "Percent")
-  ggplot(weight.m,aes(x = Price,y = Percent,fill = Weight)) + 
-          geom_bar(position = "fill") + 
-          scale_y_continuous(labels = percent_format(), name = "Proportion of Total") +
-          scale_x_discrete(name = "Price")
+  barstack <- function() {
+    ggplot(weight.m,aes(x = Price,y = Percent,fill = Weight)) + 
+      geom_bar(position = "fill") + 
+      scale_y_continuous(labels = percent_format(), name = "Proportion of Total") +
+      scale_x_discrete(name = "Price")  
+  }
+  pseq <- seq(25, 575, 25)           
+  wmr <- data.frame(cbind(pseq, wm))
+  rownames(wmr) <- NULL
+  names(wmr) <- c("x", "inf" ,"eighth", "fiveg", "quarter", "half", "ounce")
+  ribbonstack <- function() {
+    ribw <- ggplot(wmr, aes(x = x))
+    ribw + geom_ribbon(aes(ymin = half, ymax = ounce), fill = "blue") + geom_ribbon(aes(ymin = quarter, ymax = half), fill = "orange") + geom_ribbon(aes(ymin = fiveg, ymax = quarter), fill = "green") + geom_ribbon(aes(ymin = eighth, ymax = fiveg), fill = "purple") + geom_ribbon(aes(ymin = inf, ymax = eighth), fill = "brown")
+  }
+  switch(type,
+         bar = barstack(),
+         ribbon = ribbonstack()
+         )
+
 }
 
 #
