@@ -31,9 +31,11 @@ buildPOWDf <- function() {
     # counter and pagination test
     while (grepl("Next", p.next, fixed = TRUE)) {
       single.parse <- UAhtmlParse(url = paste(input.url, "?pg=", i, sep = ""))
+      if (length(readHTMLTable(single.parse, stringsAsFactors = FALSE)) < 2) return(init.table)
       init.table <- rbind(init.table, readHTMLTable(single.parse, stringsAsFactors = FALSE)[[2]])
       p.next <- xpathApply(single.parse, "//div[@id='pagination']", xmlValue)[[1]]
       i <- i + 1
+      Sys.sleep(3)
     }
     init.table
   }
