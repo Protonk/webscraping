@@ -105,7 +105,7 @@ plotstackedW <- function(type) {
   }
   switch(type,
          bar = barstack(),
-         ribbon = ribbonstack()
+         ribbon = ribbonstack(),
          density = qplot(`Price Per Oz`, data = price.df, fill = Weight, geom = "density", position="stack")
          )
 }
