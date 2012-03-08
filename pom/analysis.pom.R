@@ -98,7 +98,7 @@ plotstackedW <- function(type) {
     # one df w/ ggplot
     wmr <- data.frame(cbind(t(apply(weight.tab/rowSums(weight.tab), 1, cumsum))))
     names(wmr) <- c("eighth", "fiveg", "quarter", "half", "ounce")
-    mwmr <- cbind(rep(pseq, 5), melt(wmr))
+    mwmr <- cbind(rep(seq(25,575,25), 5), melt(wmr))
     names(mwmr) <- c("Price", "Weight", "Proportion")
     mwmr[, "Weight"] <- factor(mwmr[, "Weight"], levels = c("ounce", "half", "quarter", "fiveg", "eighth"), ordered = TRUE)
     ggplot(mwmr, aes(x = Price)) + geom_ribbon(aes(ymin = 0, ymax = Proportion, fill = Weight))
@@ -106,6 +106,7 @@ plotstackedW <- function(type) {
   switch(type,
          bar = barstack(),
          ribbon = ribbonstack(),
+         # Colors are reversed on density. 
          density = qplot(`Price Per Oz`, data = price.df, fill = Weight, geom = "density", position="stack")
          )
 }
