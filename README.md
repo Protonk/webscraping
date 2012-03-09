@@ -6,4 +6,4 @@ Subprojects will be listed in folders as they are created but most will use only
 
 ## POM
 
-User generated database of Marijuana prices by location. Very simple structure, broken into multiple pages per state dynamically. Small dataset, roughly 4100 observations.
+User generated database of Marijuana prices by location. Very simple structure, broken into multiple pages per state dynamically. Small dataset, roughly 41000 observations.
